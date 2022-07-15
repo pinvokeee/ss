@@ -9,6 +9,8 @@ class JobManager
         {
             job: null,
             subJob: null,
+            freeSpace: "",
+            checkedItems: [],
         }
 
         this.loader = 
@@ -34,6 +36,7 @@ class JobManager
                     {
                         ID: index,
                         name: job.name,
+                        tips: job.tips,
                         infoList: this.info(job.info)
                     });                       
                 });

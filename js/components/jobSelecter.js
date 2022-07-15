@@ -27,6 +27,7 @@ const jobSelecter =
             {
                 this.jobManager.selected.job = value;
                 this.jobManager.selected.subJob = null;
+                this.jobManager.selected.checkedItems = [];
             }
         },
 
@@ -40,6 +41,7 @@ const jobSelecter =
             set(value)
             {
                 this.jobManager.selected.subJob = value;
+                this.jobManager.selected.checkedItems = [];
             }
         }
     },
