@@ -47,7 +47,7 @@ const infoInputForm =
             <div class="row w-100" v-for="info in infoList" :key="info.name">
                     <div class="row">
                         <label class="">
-                            <input type="checkbox" class="form-check-input p-0" :value="info" v-model="jobManager.selected.checkedItems">
+                            <input type="checkbox" class="form-check-input p-0 ms-1" :value="info" v-model="jobManager.selected.checkedItems">
                             {{info.name}}
                         </label>
 

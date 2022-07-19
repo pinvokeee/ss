@@ -50,6 +50,9 @@ const App =
                     </div>
 
                     <div class="container-fluid col-6">
+                        <div class="col">
+                            
+                        </div>
                     </div>
                 </div>
 
