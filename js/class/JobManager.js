@@ -5,7 +5,7 @@ class JobManager
         this.title = "";
         this.jobs = [];
 
-        this.selected = 
+        this.editingData = 
         {
             job: null,
             subJob: null,

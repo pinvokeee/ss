@@ -5,11 +5,11 @@ const jobData =
     jobs:
     [
         {
-            name: "A",
+            name: "メイン",
             subJobs:
             [
                 {
-                    name: "AIUEO",
+                    name: "サブ",
                     tips: "AAAAAA",
                     info:
                     [

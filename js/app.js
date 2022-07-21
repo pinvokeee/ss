@@ -1,1 +1,1 @@
-Vue.createApp(App).mount('#app');
+new Vue(App);
