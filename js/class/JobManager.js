@@ -4,15 +4,7 @@ class JobManager
     {
         this.title = "";
         this.jobs = [];
-
-        this.editingData = 
-        {
-            job: null,
-            subJob: null,
-            freeSpace: "",
-            checkedItems: [],
-        }
-
+        
         this.loader = 
         {
             mainJob(mainJobs)
