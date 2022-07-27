@@ -93,4 +93,9 @@ class EditingData
     {
 
     }
+
+    get(name)
+    {
+        return this.local[name];
+    }
 }
