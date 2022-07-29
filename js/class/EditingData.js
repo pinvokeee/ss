@@ -7,6 +7,8 @@ class EditingData
             title: "",
             job: null,
             subJob: null,
+            freeInput: "",
+            reason: "",
             checkedItems: [],
         }
     }
@@ -35,6 +37,26 @@ class EditingData
     get subJob()
     {
         return this.local.subJob;
+    }
+
+    get freeInput()
+    {
+        return this.local.freeInput;
+    }
+
+    set freeInput(value)
+    {
+        this.local.freeInput = value;
+    }
+
+    get reason()
+    {
+        return this.local.reason;
+    }
+
+    set reason(value)
+    {
+        this.local.reason = value;
     }
 
     set subJob(value)

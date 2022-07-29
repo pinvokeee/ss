@@ -45,7 +45,12 @@ const App =
 
                 {
                     name: "4.フリー入力",
-                    value: "title",
+                    value: "freeInput",
+                },
+
+                {
+                    name: "5.退職理由",
+                    value: "reason",
                 }
             ]
         }
@@ -79,7 +84,9 @@ const App =
         {
             if (name == "title") return this.editingData.title;
             if (name == "job") return this.editingData.job?.name;
-            if (name == "subJob") return this.editingData.subjob?.name;
+            if (name == "subJob") return this.editingData.subJob?.name;
+            if (name == "freeInput") return this.editingData.freeInput;
+            if (name == "reason") return this.editingData.reason;
 
             return "";
         }
@@ -106,16 +113,25 @@ const App =
         </v-app-bar>
 
         <v-navigation-drawer app clipped permanent>
-            <v-timeline align-top dense class="fill-height">
+            <div class="mt-4 pr-4">
+            <v-timeline align-top dense class="pt-0">
                 <v-timeline-item small v-if="editingData != null" v-for="section in timelines">
                     <v-row>
                         <v-col>
-                            <v-row>{{section.name}}</v-row>
-                            <v-row>{{getValue(section.value)}}</v-row> 
+                            <div>
+                                {{section.name}}
+                            </div>
+                            <div>
+                                {{getValue(section.value)}}
+                            </div>
+                            <div v-if="section.value=='job'">
+                                {{getValue("subJob")}}
+                            </div>
                         </v-col>
                     </v-row>
                 </v-timeline-item>
             </v-timeline>
+            </div>
         </v-navigation-drawer>
 
         <v-main>
@@ -178,14 +194,14 @@ const App =
 
                                 <v-col class="d-flex flex-column align-stretch">
                                     <componentTitleBar title="4.フリー入力欄"></componentTitleBar>
-                                    <v-textarea class="mt-3" auto-grow no-resize solo label="Solo textarea"></v-textarea>
+                                    <v-textarea class="mt-3" v-model="editingData.freeInput" auto-grow no-resize solo label="Solo textarea"></v-textarea>
                                 </v-col>
                             </v-row>
 
                             <v-row>
                                 <v-col>
                                 <componentTitleBar title="5.退職理由"></componentTitleBar>
-                                <v-textarea class="mt-3" auto-grow no-resize solo label="Solo textarea"></v-textarea>
+                                <v-textarea class="mt-3" v-model="editingData.reason" auto-grow no-resize solo label="Solo textarea"></v-textarea>
                                 </v-col>
                             </v-row>
                         </div>
