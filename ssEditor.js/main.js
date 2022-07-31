@@ -7,7 +7,6 @@ const App =
     components:
     {
         componentTitleBar,
-        dialogCreateMainJob,
         // jobSelecter, infoInputForm
     },
 
@@ -89,6 +88,34 @@ const App =
             if (name == "reason") return this.editingData.reason;
 
             return "";
+        },
+
+        async a()
+        {
+            
+            // const dirHandle = await window.showDirectoryPicker(
+            //     {
+            //         mode: "readwrite"
+            //     }
+            // );
+
+            // console.log(dirHandle.entries());
+
+            // const a = dirHandle.entries();
+
+            // while (a.next())
+            // {
+            //     console.log(a.next());
+                
+            // }
+
+        // const file = await fileHandle.getFile();
+        // const fileContents = await file.text();
+
+        // const writable = await fileHandle.createWritable();
+        // await writable.write("dwadwad"/*⇦書き込む内容*/);
+        // await writable.close();
+
         }
     },
 
@@ -97,11 +124,10 @@ const App =
 
         <!-- 上部ツールバー -->
         <v-app-bar color="white" elevate-on-scroll app clipped-left>
-            <v-app-bar-nav-icon></v-app-bar-nav-icon>
             <v-toolbar-title>{{jobManager.title}}</v-toolbar-title>
-                
-            <v-btn icon>
-            <v-icon>mdi-magnify</v-icon>
+            <v-spacer></v-spacer>
+            <v-btn icon color="primary" @click="a">
+            <v-icon>mdi-cog</v-icon>
             </v-btn>
         </v-app-bar>
 
@@ -113,9 +139,9 @@ const App =
         </v-app-bar>
 
         <v-navigation-drawer app clipped permanent>
-            <div class="mt-4 pr-4">
-            <v-timeline align-top dense class="pt-0">
-                <v-timeline-item small v-if="editingData != null" v-for="section in timelines">
+            <div class="pt-4 pr-4  fill-height">
+            <v-timeline align-top dense class="pt-0 fill-height">
+                <v-timeline-item color="green" small  v-if="editingData != null" v-for="section in timelines">
                     <v-row>
                         <v-col>
                             <div>
