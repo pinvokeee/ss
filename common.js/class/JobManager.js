@@ -24,6 +24,7 @@ class JobManager
             {
                 return subJobs.map((job, index) =>
                 {
+                    console.log(job.tips);
                     return new SubJob(
                     {
                         ID: index,
@@ -67,5 +68,41 @@ class JobManager
     {
         this.title = source.title;
         this.jobs = this.loader.mainJob(source.jobs);
+    }
+
+    generateJSONString()
+    {
+        const output_data = { title: "", jobs: [] };
+
+        output_data.title = this.title;
+
+        for (const j of this.jobs)
+        {
+            const job = { name: j.name, subJobs: [] };
+            
+            for (const sj of j.subJobs)
+            {
+                const subjob = { name: sj.name, infoList: [] };
+
+                for (const inf of sj.infoList)
+                {
+                    const info = { name: inf.name, items: [] };
+
+                    for (const it of inf.items)
+                    {
+                        const item = { name: it.name, suffix: it.suffix, prefix: it.prefix };
+                        info.items.push(item);
+                    }
+
+                    subjob.infoList.push(info);
+                }   
+                
+                job.subJobs.push(subjob);
+            }
+
+            output_data.jobs.push(job);
+        }
+
+        console.log(JSON.stringify(output_data));
     }
 }

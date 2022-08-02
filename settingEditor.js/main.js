@@ -1,3 +1,43 @@
+/**
+ * ツールチップ表示用ボタンコンポーネント
+ */
+const componentToolTipButton = 
+{
+    props:
+    {
+        buttonText:
+        {
+            type: String
+        },
+
+        buttonIcon:
+        {
+            type: String
+        },
+
+        color:
+        {
+            type: String
+        },
+
+        disabled:
+        {
+            type: Boolean
+        }
+    },
+
+    template: `
+    <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+                <v-btn icon :disabled="disabled" :color="color" tabIndex="-1" v-bind="attrs" v-on="on" @click="$emit('click')">
+                    <v-icon>{{buttonIcon}}</v-icon>
+                </v-btn>
+            </template>
+        <span>{{buttonText}}</span>
+    </v-tooltip>
+    `
+}
+
 const App = 
 {
     el: "#app",
@@ -6,191 +46,370 @@ const App =
     
     components:
     {
+        "ttButton": componentToolTipButton,
     },
 
     data()
     {
         return {
             jobManager: new JobManager(),
-            selectedMainJob: null,
-            selectedSubJob: null,
+            _selectedMainJob: null,
+            _selectedSubJob: null,
+            _aa: "",
         }
     },
 
     mounted()
     {
-        for (let i = 0; i < 100; i++)
-        {
-            jobData.jobs.push({name: "test", subJobs:[]});
-        }
-
+        // for (let i = 0; i < 100; i++)
+        // {
+        //     jobData.jobs.push({name: "test", subJobs:[]});
+        // }
+        // this.selectedMainJob = {};
         this.jobManager.load(jobData);
+
+        console.log(this);
+
+        console.log(this.aa);
+        this.aa = "Test" ;
+        console.log(this.aa);
+        // setTimeout(function (){ this.aa = "Test" }, 5000);
     },
 
     computed:
     {
+        aa: 
+        {
+            get: function()
+            {
+                return this._aa;
+            },
 
+            set(value)
+            {
+                this._aa = value;
+            }
+        },
+
+        selectedMainJob:
+        {
+            cache: false,
+
+            get()
+            {
+                return this._selectedMainJob;
+            },
+
+            set(value)
+            {
+                this._selectedMainJob = value;
+                console.log(value.subJobs);
+            }
+        },
+        
+        selectedSubJob:
+        {
+            cache: false,
+
+            get()
+            {
+                console.log(this.selectedMainJob);
+                return this._selectedSubJob;
+            },
+
+            set(value)
+            {
+                this._selectedSubJob = value;
+            }
+        }      
     },
 
     methods:
     {
-        
+        click_append_newMainJob()
+        {
+            const new_item = new Job();
+
+            new_item.ID = this.jobManager.jobs.length;
+            new_item.name = `新規JOB${new_item.ID + 1}`;
+
+            this.edit_JobName(new_item, "JOB名を入力してください");
+
+            this.jobManager.jobs.push(new_item);
+        },
+
+        click_removeMainJobItem(ID)
+        {
+            this.selectedMainJob = null;
+            this.jobManager.jobs.splice(ID, 1);
+            this.assignID(this.jobManager.jobs);
+        },
+
+        click_removeSubJobItem(ID)
+        {
+            
+            this.selectedSubJob = null;
+            this.selectedMainJob.subJobs.splice(ID, 1);
+            this.assignID(this.selectedMainJob.subJobs);
+        },
+
+        click_append_newSubJob()
+        {
+            const new_item = new SubJob();
+
+            new_item.ID = this.selectedMainJob.subJobs.length;
+            new_item.name = `新規サブJOB${new_item.ID + 1}`;
+
+            this.edit_JobName(new_item, "サブJOB名を入力してください");
+
+            this.selectedMainJob.subJobs.push(new_item);
+        },
+
+        click_changeName_selectedMainJob()
+        {
+            this.edit_JobName(this.selectedMainJob, "変更後のJOB名を入力してください");
+        },
+
+        click_change_moveMainJob(parent, fromIndex)
+        {
+            const item = parent[fromIndex];
+            const moved_id = this.swapItem(parent, fromIndex);
+            
+            this.assignID(parent);
+
+            this.$nextTick(function() 
+            {
+                this.selectedMainJob = null;
+
+                this.$nextTick(function() 
+                {
+                    this.selectedMainJob = parent[moved_id];            
+                });
+            });
+        },
+
+        click_changeName_selectedSubJob()
+        {
+            this.edit_JobName(this.selectedSubJob, "変更後のサブJOB名を入力してください");
+        },
+
+        click_change_moveSubJob(parent, fromIndex)
+        {
+            const item = parent[fromIndex];
+            const moved_id = this.swapItem(parent, fromIndex);
+            
+            this.$nextTick(function() 
+            {
+                this.selectedSubJob = null;
+
+                this.$nextTick(function() 
+                {
+                    this.selectedSubJob = parent[moved_id];            
+                });
+            });
+        },
+
+        edit_JobName(item, message)
+        {
+            const name = prompt(message, item.name);
+            if (name != null || name.length > 0) item.name = name;
+
+            return item;
+        },
+
+        click_append_newInfoItem()
+        {
+            const new_info = new Info();
+            new_info.ID = this.selectedSubJob.infoList.length;
+            new_info.name = "新規項目";
+
+            this.selectedSubJob.infoList.push(new_info);
+
+            this.$nextTick(function() 
+            {
+                const elList = this.$refs["infoList"];
+                const lastElement = elList[elList.length - 1];
+                lastElement.scrollIntoView({behavior: 'smooth'});
+
+                lastElement.querySelector("input").select();
+            });
+        },
+
+        click_move_infoItem(parent, fromIndex)
+        {
+            this.swapItem(parent.infoList, fromIndex);
+        },
+
+        click_remove_infoItem(parent, index)
+        {
+            parent.infoList.splice(index, 1);
+        },
+
+        click_append_newInputItem(target_info)
+        {
+            const new_inputItem = new InputItem();
+            new_inputItem.ID = target_info.items.length;
+
+            target_info.items.push(new_inputItem);
+        },
+
+        click_move_inputItem(parent, fromIndex)
+        {
+            this.swapItem(parent.items, fromIndex);
+        },
+
+        click_remove_inputItem(parent, index)
+        {
+            parent.items.splice(index, 1);
+        },
+
+        swapItem(arr, fromIndex)
+        {
+            const to = fromIndex + 1 < arr.length ? fromIndex + 1 : fromIndex - 1;
+            const to_id = arr[to].ID;
+            arr[to].ID = arr[fromIndex].ID;
+            arr[fromIndex].ID = to_id;
+            
+            arr.sort((a, b) => a.ID - b.ID);
+
+            return to;
+        },
+
+        assignID(arr)
+        {
+            for (let i = 0; i < arr.length; i++)
+            {
+                arr[i].ID = i;
+            }
+        },
+
+        click_download_settingFile()
+        {
+            this.jobManager.generateJSONString();
+        }
     },
 
     template: `
         <v-app>
 
         <!-- 上部ツールバー -->
-        <v-app-bar dark color="error" elevate-on-scroll app clipped-left>
+        <v-app-bar  dark color="error" elevate-on-scroll app clipped-left>
             <v-toolbar-title>JOB設定</v-toolbar-title>
             <v-spacer></v-spacer>
-            <!-- <v-btn icon color="white">
-            <v-icon>mdi-cog</v-icon>
-            </v-btn> -->
-
-            <!-- <template v-slot:extension>
-                <v-tabs v-model="tab" align-with-title >
-                    <v-tabs-slider color="yellow"></v-tabs-slider>
-                    <v-tab v-for="mainJob in jobManager.jobs" :key="mainJob.ID">
-                        {{ mainJob.name }}
-                    </v-tab>
-                </v-tabs>
-                <v-btn text v-icon>メインJOB追加</v-btn>
-style="height: 80%" class="overflow-auto"
-            </template> -->
+            <ttButton color="white" buttonText="設定ファイルをダウンロード" buttonIcon="mdi-tray-arrow-down" @click="click_download_settingFile"></ttButton>
         </v-app-bar>
 
-        <v-navigation-drawer permanent clipped app width="400">
+        <v-navigation-drawer permanent clipped app width="500">
             <v-row class="fill-height" no-gutters>
 
                 <v-navigation-drawer permanent mini-variant mini-variant-width="50%">                    
-                    <v-list dense>
-                        <v-toolbar flat dense style="z-index:2;position:sticky;top:0;">
-                        <v-toolbar-title>メイン</v-toolbar-title>
-                            <v-btn icon>
-                                <v-icon>mdi-plus-circle</v-icon>
-                            </v-btn>
-                            <v-btn icon>
-                                <v-icon>mdi-pencil</v-icon>
-                            </v-btn>
-                        </v-toolbar>
-                        
-                        <v-list-item-group v-model="selectedMainJob" color="primary">
-                            <v-list-item v-for="job in jobManager.jobs" :key="job.ID" :value="job">
-                                <v-list-item-content>
-                                    <v-list-item-title v-text="job.name"></v-list-item-title>
-                                </v-list-item-content>
-                            </v-list-item>
-                        </v-list-item-group>
-                    </v-list>
+                    <div style="width: 98%">
+                        <v-list dense>
+                            <v-toolbar height="80px" flat dense style="z-index:2;position:sticky;top:0;">
+                                <div>
+                                    <v-row>
+                                        メイン
+                                    </v-row>
+                                    <v-row>
+                                    <ttButton buttonText="JOB追加" buttonIcon="mdi-plus" color="primary" @click="click_append_newMainJob"></ttButton>
+                                    <ttButton :disabled="selectedMainJob == null" buttonText="JOB名編集" buttonIcon="mdi-pencil" color="primary" @click="click_changeName_selectedMainJob"></ttButton>
+                                    <ttButton 
+                                    :disabled="selectedMainJob == null" 
+                                    :buttonIcon="jobManager?.jobs.length - 1 == selectedMainJob?.ID ? 'mdi-arrow-up-bold' : 'mdi-arrow-down-bold'"
+                                    :buttonText="jobManager?.jobs.length - 1 == selectedMainJob?.ID ? '上へ移動' : '下へ移動'"
+                                    @click="click_change_moveMainJob(jobManager?.jobs, selectedMainJob?.ID)"
+                                    color="primary">
+                                    </ttButton>
+                                    <ttButton :disabled="selectedMainJob == null"  color="error" buttonText="削除" buttonIcon="mdi-close" @click="click_removeMainJobItem(selectedMainJob.ID)"></ttButton>
+                                    </v-row>
+                                </div>
+                            </v-toolbar>
+                            
+                            <v-list-item-group v-model="selectedMainJob" color="primary">
+                                <v-list-item v-for="job in jobManager.jobs" :key="job.ID" :value="job">
+                                    <v-list-item-content>
+                                        <v-list-item-title v-text="job.name"></v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                            </v-list-item-group>
+                        </v-list>
+                    </div>
                 </v-navigation-drawer>
                 
-    <div>
-    <v-toolbar color="white" flat dense style="z-index:2;position:sticky;top:0;">
-                        <v-toolbar-title>サブ</v-toolbar-title>
-                        <v-btn icon>
-                            <v-icon>mdi-plus-circle</v-icon>
-                        </v-btn>
-                        <v-btn icon>
-                            <v-icon>mdi-pencil</v-icon>
-                        </v-btn>
-                    </v-toolbar>
-                <v-list dense class="grow">
-                    
+                <div style="width:49%;">
 
-                    <v-list-item-group  class="grow" v-model="selectedSubJob" color="primary">
-                        <v-list-item v-for="job in selectedMainJob?.subJobs" :key="job.ID" :value="job">
-                            <v-list-item-content>
-                                <v-list-item-title v-text="job.name"></v-list-item-title>
-                            </v-list-item-content>
-                        </v-list-item>
-                    </v-list-item-group>
-                </v-list>
-</div>
+                    <v-list dense class="grow">
+                        <v-toolbar height="80px" color="white" flat dense style="z-index:2;position:sticky;top:0;">
+                            <div>
+                                <v-row>
+                                    サブJOB
+                                </v-row>
+                                <v-row>
+                                    <ttButton :disabled="selectedMainJob == null" buttonText="JOB追加" buttonIcon="mdi-plus" color="primary" @click="click_append_newSubJob"></ttButton>
+                                    <ttButton :disabled="selectedSubJob == null" buttonText="JOB名編集" buttonIcon="mdi-pencil" color="primary" @click="click_changeName_selectedSubJob"></ttButton>
+                                    <ttButton 
+                                    :disabled="selectedSubJob == null" 
+                                    :buttonIcon="selectedMainJob?.subJobs.length - 1 == selectedSubJob?.ID ? 'mdi-arrow-up-bold' : 'mdi-arrow-down-bold'"
+                                    :buttonText="selectedMainJob?.subJobs.length - 1 == selectedSubJob?.ID ? '上へ移動' : '下へ移動'"
+                                    @click="click_change_moveSubJob(selectedMainJob?.subJobs, selectedSubJob?.ID)"
+                                    color="primary">
+                                    </ttButton>
+                                    <ttButton :disabled="selectedSubJob == null"  color="error" buttonText="削除" buttonIcon="mdi-close" @click="click_removeSubJobItem(selectedSubJob.ID)"></ttButton>
+                                    
+                                </v-row>
+                            </div>
+                        </v-toolbar>
 
-                    <!-- <v-toolbar color="white" flat dense style="z-index:2;position:sticky;top:0;">
-                        <v-toolbar-title>メイン</v-toolbar-title>
-                        <v-btn icon>
-                            <v-icon>mdi-plus-circle</v-icon>
-                        </v-btn>
-                        <v-btn icon>
-                            <v-icon>mdi-pencil</v-icon>
-                        </v-btn>
-                    </v-toolbar>
-
-                    <v-list dense>
-                        <v-list-item-group v-model="selectedMainJob" color="primary">
-                            <v-list-item v-for="job in jobManager.jobs" :key="job.ID" :value="job">
+                        <v-list-item-group  class="grow" v-model="selectedSubJob" color="primary">
+                            <v-list-item v-for="job in selectedMainJob?.subJobs" :key="job.ID" :value="job">
                                 <v-list-item-content>
                                     <v-list-item-title v-text="job.name"></v-list-item-title>
                                 </v-list-item-content>
                             </v-list-item>
                         </v-list-item-group>
                     </v-list>
-                </v-col>
+                </div>
 
-                <v-navigation-drawer permanent clipped >
-                    <v-toolbar color="white" flat dense style="z-index:2;position:sticky;top:0;">
-                                <v-toolbar-title>サブ</v-toolbar-title>
-                                    <v-btn icon>
-                                        <v-icon>mdi-plus-circle</v-icon>
-                                    </v-btn>
-                                    <v-btn icon>
-                                        <v-icon>mdi-pencil</v-icon>
-                                    </v-btn>
-                                </v-toolbar>
-                            
-                                <v-list dense>
-                                    <v-list-item-group v-model="selectedSubJob" color="primary">
-                                        <v-list-item v-for="job in selectedMainJob?.subJobs" :key="job.ID" :value="job">
-                                            <v-list-item-content>
-                                                <v-list-item-title v-text="job.name"></v-list-item-title>
-                                            </v-list-item-content>
-                                        </v-list-item>
-                                    </v-list-item-group>
-                                </v-list>
-
-                    </v-navigation-drawer> -->
             </v-row>
 
         </v-navigation-drawer>
    
  
-        <v-main>            
+        <v-main>          
+            {{aa}}
+        <v-sheet class="d-flex flex-column" >
 
-        <v-container class="fill-height" color="red" fluid align-start>
-            <v-row class="" >
+            <v-toolbar class="mb-2" style="z-index:2;position:sticky;top:68px;" flat dense>
+                <v-btn :disabled="selectedSubJob == null" color="primary" @click="click_append_newInfoItem">
+                    <v-icon>mdi-plus</v-icon>
+                    新規追加
+                </v-btn>
+            </v-toolbar>
+            
 
-                <v-col cols="auto">
+            <div class="pa-4" v-if="selectedSubJob != null">
+                <v-textarea label="tips" rows="3" placeholder="表示するtipsを入力してください" auto-grow outlined no-resize v-model="selectedSubJob.tips"></v-textarea>
+            </div>
 
-                </v-col>
-
-                <v-col cols="auto">
-
-                </v-col>
-
-                <v-col class="overflow-auto" style="max-height:80%">
-                    
-     
-                <v-toolbar floating  dense>
-                        <!-- <v-spacer></v-spacer> -->
-
-                        <v-btn >
-                            <v-icon>mdi-plus-circle</v-icon>
-                            新規追加
-                        </v-btn>
-
-                    </v-toolbar>
-
-
-                    <v-sheet >
-                        <div v-for="info in selectedSubJob?.infoList" class="mb-8">
-                            <v-sheet class="pa-4">
-                                <v-row>
-                                    <v-col cols="6">
-                                        <v-text-field label="項目名" v-model="info.name" dense hide-details></v-text-field>
-                                    </v-col>
-                                </v-row>
+            <v-container class="fill-height" align-start>
+                <v-row>
+                    <v-col>
+                        <div v-for="(info, info_index) in selectedSubJob?.infoList" class="mb-8" ref="infoList">
+                            <v-card outlined class="pa-4">
+                                <v-card-subtitle>
+                                    <v-row>
+                                        <v-col>
+                                            <v-text-field label="項目名" v-model="info.name" dense hide-details></v-text-field>
+                                        </v-col>
+                                        <v-col  cols="1">
+                                            <ttButton color="primary" :disabled="selectedSubJob?.infoList.length < 2" :buttonText="selectedSubJob?.infoList.length - 1 == info_index ? '上へ移動' : '下へ移動'" :buttonIcon="selectedSubJob?.infoList.length - 1 == info_index ? 'mdi-arrow-up-bold' : 'mdi-arrow-down-bold'" @click="click_move_infoItem(selectedSubJob, info_index)"></ttButton>
+                                        </v-col>
+                                        <v-col  cols="1">
+                                            <ttButton color="error" buttonText="削除" buttonIcon="mdi-close" @click="click_remove_infoItem(selectedSubJob, info_index)"></ttButton>
+                                        </v-col>
+                                    </v-row>
+                                    </v-card-subtitle>
+                                <v-card-text>
                                 <v-row>
                                     <v-col>
                                         <v-simple-table>
@@ -209,26 +428,20 @@ style="height: 80%" class="overflow-auto"
                                                 <th>
                                                 </th>
                                                 <th>
-                                                    <v-btn icon color="primary" @click="a">
-                                                    <v-icon>mdi-plus-circle</v-icon>
-                                                    </v-btn>
+                                                    <ttButton color="primary" buttonText="項目を追加" buttonIcon="mdi-plus" @click="click_append_newInputItem(info)"></ttButton>
                                                 </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr v-for="item in info.items">
+                                                <tr v-for="(item, index) in info.items">
                                                 <td><v-text-field placeholder="入力してください" v-model="item.prefix" dense hide-details></v-text-field></td>
                                                 <td><v-text-field placeholder="入力してください" v-model="item.name" dense hide-details></v-text-field></td>
                                                 <td><v-text-field placeholder="入力してください" v-model="item.suffix" dense hide-details></v-text-field></td>                                                
-                                                <td>                                                
-                                                    <v-btn icon color="primary" @click="a">
-                                                    <v-icon>mdi-swap-vertical-bold</v-icon>
-                                                    </v-btn>
+                                                <td>                                                                                                    
+                                                    <ttButton color="primary" :buttonText="info.items.length - 1 == index ? '上へ移動' : '下へ移動'" :buttonIcon="info.items.length - 1 == index ? 'mdi-arrow-up-bold' : 'mdi-arrow-down-bold'" @click="click_move_inputItem(info, index)"></ttButton>
                                                 </td>
-                                                <td>
-                                                    <v-btn icon color="error" @click="a">
-                                                    <v-icon>mdi-minus-circle</v-icon>
-                                                    </v-btn>
+                                                <td>                                                
+                                                    <ttButton color="error" buttonText="削除" buttonIcon="mdi-close" @click="click_remove_inputItem(info, index)"></ttButton>
                                                 </td>
                                                 </tr>
                                             </tbody>
@@ -236,17 +449,20 @@ style="height: 80%" class="overflow-auto"
                                         </v-simple-table>
                                     </v-col>
                                 </v-row>
-                            </v-sheet>
 
-                            <v-divider class="mt-4"></v-divider>
+                                </v-card-text>
+                            </v-card>
 
                         </div>
-                    </v-sheet>
-                </v-col> 
-            </v-row>
-        </v-container>
-
+                    </v-col>
+                        </v-row>                            
+                    </v-col>                        
+                </v-row>
+                
+            </v-container>
+        </v-sheet>
         </v-main>
         </v-app>
     `,
 }
+

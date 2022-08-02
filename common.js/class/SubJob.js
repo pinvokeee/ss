@@ -4,6 +4,7 @@ class SubJob
     {
         this.name = "SUBJOB";
         this.infoList = [];
+        this.tips = "";
 
         if (prop != null)
         {
