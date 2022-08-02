@@ -98,6 +98,11 @@ const App =
             if (result) this.editingData = new EditingData();
         },
 
+        opneSetting()
+        {
+            window.open('./settingEditor.html', '_blank');
+        },
+
         async a()
         {
             
@@ -134,7 +139,7 @@ const App =
         <v-app-bar color="success" elevate-on-scroll app clipped-left>
             <v-toolbar-title class="white--text" color="white">{{jobManager.title}}</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn icon color="white" @click="a">
+            <v-btn icon color="white" @click="opneSetting">
             <v-icon>mdi-cog</v-icon>
             </v-btn>
         </v-app-bar>
