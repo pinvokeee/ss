@@ -95,6 +95,32 @@ class EditingData
         this.local.checkedItems = value;
     }
 
+    getCheckedItemListText()
+    {
+        if (this.local.checkedItems == null) return [];
+
+        const arr = [];
+
+        for (const item of this.local.checkedItems)
+        {
+            if (item.checked)
+            {
+                arr.push(`${item.name}`);
+
+                for (const c of item.items)
+                {
+                    if (c.value != null &&  c.value.length > 0)
+                    {
+                        arr.push(`${c.name}:${c.prefix}${c.value}${c.suffix}`);
+                    }
+                }
+            }
+        }
+
+        return arr;
+        // console.log(this.local.checkedItems);
+    }
+
     get sh()
     {
         return this.checkedItems?.map(item => {

@@ -84,6 +84,7 @@ const App =
             if (name == "title") return this.editingData.title;
             if (name == "job") return this.editingData.job?.name;
             if (name == "subJob") return this.editingData.subJob?.name;
+            if (name == "content") return this.editingData.getCheckedItemListText().join("\n");
             if (name == "freeInput") return this.editingData.freeInput;
             if (name == "reason") return this.editingData.reason;
 
@@ -219,7 +220,7 @@ const App =
                                 <v-col>
                                     <componentTitleBar title="3.内容"></componentTitleBar>
                                     <template v-for="ch in editingData.checkedItems">                                        
-                                        <v-checkbox class="black--text" :label="ch.name" v-model="ch.checked"></v-checkbox>
+                                        <v-checkbox :label="ch.name" v-model="ch.checked"></v-checkbox>
                                         <template v-for="item in ch.items">
                                             <v-text-field :disabled="!ch.checked" :label="item.name" :prefix="item.prefix" :suffix="item.suffix" v-model="item.value">
                                                 </v-text-field>
