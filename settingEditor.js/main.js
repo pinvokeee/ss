@@ -53,73 +53,46 @@ const App =
     {
         return {
             jobManager: new JobManager(),
-            _selectedMainJob: null,
-            _selectedSubJob: null,
-            _aa: "",
+
+            local:
+            {
+                _selectedMainJob: null,
+                _selectedSubJob: null,
+            },
         }
     },
 
     mounted()
     {
-        // for (let i = 0; i < 100; i++)
-        // {
-        //     jobData.jobs.push({name: "test", subJobs:[]});
-        // }
-        // this.selectedMainJob = {};
         this.jobManager.load(jobData);
-
-        console.log(this);
-
-        console.log(this.aa);
-        this.aa = "Test" ;
-        console.log(this.aa);
-        // setTimeout(function (){ this.aa = "Test" }, 5000);
     },
 
     computed:
     {
-        aa: 
-        {
-            get: function()
-            {
-                return this._aa;
-            },
-
-            set(value)
-            {
-                this._aa = value;
-            }
-        },
-
         selectedMainJob:
         {
-            cache: false,
-
             get()
             {
-                return this._selectedMainJob;
+                return this.local._selectedMainJob;
             },
 
             set(value)
             {
-                this._selectedMainJob = value;
-                console.log(value.subJobs);
+                this.local._selectedMainJob = value;
+                this.selectedSubJob = null;
             }
         },
         
         selectedSubJob:
         {
-            cache: false,
-
             get()
             {
-                console.log(this.selectedMainJob);
-                return this._selectedSubJob;
+                return this.local._selectedSubJob;
             },
 
             set(value)
             {
-                this._selectedSubJob = value;
+                this.local._selectedSubJob = value;
             }
         }      
     },
@@ -285,8 +258,18 @@ const App =
 
         click_download_settingFile()
         {
-            this.jobManager.generateJSONString();
+            this.$refs["download_link"].click();
+        },
+
+        download() 
+        {
+            const st = `const jobData=${this.jobManager.generateJSONString()}`;
+            var content = st;
+            var blob = new Blob([ content ], { "type" : "text/plain" });
+
+            this.$refs["download_link"].href = window.URL.createObjectURL(blob);
         }
+
     },
 
     template: `
@@ -297,6 +280,7 @@ const App =
             <v-toolbar-title>JOB設定</v-toolbar-title>
             <v-spacer></v-spacer>
             <ttButton color="white" buttonText="設定ファイルをダウンロード" buttonIcon="mdi-tray-arrow-down" @click="click_download_settingFile"></ttButton>
+            <a style="display:none;" ref="download_link" href="#" download="jobData.js" @click="download"></a>
         </v-app-bar>
 
         <v-navigation-drawer permanent clipped app width="500">
@@ -375,8 +359,7 @@ const App =
         </v-navigation-drawer>
    
  
-        <v-main>          
-            {{aa}}
+        <v-main>
         <v-sheet class="d-flex flex-column" >
 
             <v-toolbar class="mb-2" style="z-index:2;position:sticky;top:68px;" flat dense>

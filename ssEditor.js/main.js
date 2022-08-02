@@ -90,6 +90,13 @@ const App =
             return "";
         },
 
+        clearEditingData()
+        {
+            const result = confirm("本当にすべてクリアしますか？");
+
+            if (result) this.editingData = new EditingData();
+        },
+
         async a()
         {
             
@@ -123,10 +130,10 @@ const App =
         <v-app>
 
         <!-- 上部ツールバー -->
-        <v-app-bar color="white" elevate-on-scroll app clipped-left>
-            <v-toolbar-title>{{jobManager.title}}</v-toolbar-title>
+        <v-app-bar color="success" elevate-on-scroll app clipped-left>
+            <v-toolbar-title class="white--text" color="white">{{jobManager.title}}</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn icon color="primary" @click="a">
+            <v-btn icon color="white" @click="a">
             <v-icon>mdi-cog</v-icon>
             </v-btn>
         </v-app-bar>
@@ -135,24 +142,25 @@ const App =
         <v-app-bar class="pr-4" color="white" elevate-on-scroll bottom app clipped-left>
             <v-btn raised large min-width="200" color="primary" @click="click_showOutput">出力</v-btn>
             <v-spacer></v-spacer>
-            <v-btn raised large width="80" color="error">クリア</v-btn>
+            <v-btn raised large width="80" color="error" @click="clearEditingData">クリア</v-btn>
         </v-app-bar>
 
-        <v-navigation-drawer app clipped permanent>
+        <v-navigation-drawer app clipped permanent width="400">
             <div class="pt-4 pr-4  fill-height">
-            <v-timeline align-top dense class="pt-0 fill-height">
+            <v-timeline align-top dense class="pt-0">
                 <v-timeline-item color="green" small  v-if="editingData != null" v-for="section in timelines">
                     <v-row>
                         <v-col>
-                            <div>
+                            <!-- <div>
                                 {{section.name}}
-                            </div>
-                            <div>
-                                {{getValue(section.value)}}
-                            </div>
-                            <div v-if="section.value=='job'">
-                                {{getValue("subJob")}}
-                            </div>
+                            </div> -->
+                            <v-card>
+                                <v-card-subtitle> {{section.name}}</v-card-subtitle>
+                                <v-card-text>
+                                    <v-row><v-col>{{getValue(section.value)}}</v-col></v-row>
+                                    <template v-if="section.value=='job'"><v-row><v-col>{{getValue("subJob")}}</v-col></v-row></template>
+                                </v-card-text>
+                            </v-card>
                         </v-col>
                     </v-row>
                 </v-timeline-item>
@@ -171,7 +179,7 @@ const App =
                             <v-row>
                                 <v-col>
                                     <componentTitleBar title="1.タイトル"></componentTitleBar>
-                                    <v-text-field class="mt-3" label="タイトル" hide-details dense   v-model="editingData.title"></v-text-field>
+                                    <v-text-field class="mt-3" placeholder="タイトルを入力してください" hide-details dense   v-model="editingData.title"></v-text-field>
                                 </v-col>
                             </v-row>
                             <v-row>
@@ -202,6 +210,7 @@ const App =
                                 <v-col>
                                     <v-card>
                                         <v-card-subtitle>TIPS</v-card-subtitle>
+                                        <v-card-text>{{editingData?.subJob?.tips}}</v-card-text>
                                     </v-card>
                                 </v-col>
                             </v-row>
@@ -210,7 +219,7 @@ const App =
                                 <v-col>
                                     <componentTitleBar title="3.内容"></componentTitleBar>
                                     <template v-for="ch in editingData.checkedItems">                                        
-                                        <v-checkbox :label="ch.name" v-model="ch.checked"></v-checkbox>
+                                        <v-checkbox class="black--text" :label="ch.name" v-model="ch.checked"></v-checkbox>
                                         <template v-for="item in ch.items">
                                             <v-text-field :disabled="!ch.checked" :label="item.name" :prefix="item.prefix" :suffix="item.suffix" v-model="item.value">
                                                 </v-text-field>
@@ -220,14 +229,14 @@ const App =
 
                                 <v-col class="d-flex flex-column align-stretch">
                                     <componentTitleBar title="4.フリー入力欄"></componentTitleBar>
-                                    <v-textarea class="mt-3" v-model="editingData.freeInput" auto-grow no-resize solo label="Solo textarea"></v-textarea>
+                                    <v-textarea class="mt-3" v-model="editingData.freeInput" auto-grow no-resize solo label="左記に入力できなかった内容を入力してください"></v-textarea>
                                 </v-col>
                             </v-row>
 
                             <v-row>
                                 <v-col>
                                 <componentTitleBar title="5.退職理由"></componentTitleBar>
-                                <v-textarea class="mt-3" v-model="editingData.reason" auto-grow no-resize solo label="Solo textarea"></v-textarea>
+                                <v-textarea class="mt-3" v-model="editingData.reason" auto-grow no-resize solo label="退職理由を入力してください"></v-textarea>
                                 </v-col>
                             </v-row>
                         </div>
@@ -235,10 +244,19 @@ const App =
 
                 </v-row>
                 </v-container>
-                <v-bottom-sheet v-model="showOutputSheet" persistent>
-                        <v-sheet class="text-center" height="200px">
-                            <v-textarea no-resize label="出力結果" :value="editingData.outputText"></v-textarea>
-                        </v-sheet>
+                <v-bottom-sheet v-model="showOutputSheet" persistent height="50%">
+                    <v-sheet class="pa-4 text-center" height="50%">
+                        <v-toolbar color="success" height="48px" flat dense>
+                            <div class="white--text">出力結果</div>
+                            <v-spacer></v-spacer>
+                            <v-btn icon color="white" @click="showOutputSheet=false">
+                                <v-icon>mdi-close</v-icon>
+                            </v-btn>
+                        </v-toolbar>
+                            
+                        <textarea  class="pa-2" style="outline:none;border:1px solid gray;width:100%;height:300px;" :value="editingData.outputText"></textarea>
+                            
+                    </v-sheet> 
                 </v-bottom-sheet>
 
             </v-sheet>

@@ -72,7 +72,7 @@ class JobManager
 
     generateJSONString()
     {
-        const output_data = { title: "", jobs: [] };
+        const output_data = { title: "JOBデータ", jobs: [] };
 
         output_data.title = this.title;
 
@@ -82,7 +82,7 @@ class JobManager
             
             for (const sj of j.subJobs)
             {
-                const subjob = { name: sj.name, infoList: [] };
+                const subjob = { name: sj.name, tips: sj.tips, info: [] };
 
                 for (const inf of sj.infoList)
                 {
@@ -94,7 +94,7 @@ class JobManager
                         info.items.push(item);
                     }
 
-                    subjob.infoList.push(info);
+                    subjob.info.push(info);
                 }   
                 
                 job.subJobs.push(subjob);
@@ -103,6 +103,6 @@ class JobManager
             output_data.jobs.push(job);
         }
 
-        console.log(JSON.stringify(output_data));
+        return JSON.stringify(output_data);
     }
 }
