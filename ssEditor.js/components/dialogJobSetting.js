@@ -1,8 +1,0 @@
-const dialogJobSetting = 
-{
-
-    template: `
-        
-    
-    `
-}

@@ -1,1 +1,0 @@
-const jobData={"title":"Test","jobs":[{"name":"新規JOB1","subJobs":[{"name":"新規サブJOB1","tips":"CCCC","info":[{"name":"金額AA","items":[{"name":"Test","suffix":"円","prefix":"\\"}]},{"name":"金額BB","items":[{"name":"Test2","suffix":"","prefix":"\\"}]}]},{"name":"新規サブJOB2","tips":"AAA","info":[{"name":"aaaaa","items":[{"name":"Test","suffix":"円","prefix":""}]}]}]}]}
